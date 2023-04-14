@@ -1,15 +1,18 @@
 class Stakeholder:
 
-    def __init__(self, nombre: str, recomendadoPor: list[str] = []):
-        self.nombre = nombre
-        self.recomendadoPor = recomendadoPor
-        self.importancia = len(recomendadoPor)
+    def __init__(self, nombre: str, recomendado_por: list = None):
+        self._nombre = nombre
+        if recomendado_por is None:
+            self._recomendado_por = []
+        else:
+            self._recomendado_por = recomendado_por
+
+    def importancia(self):
+        return self._recomendado_por.count()
 
     def recomendar(self, stakeholder: str):
-        self.recomendadoPor.append(stakeholder)
-        self.importancia += 1
+        self._recomendado_por.append(stakeholder)
 
-    def cancelarRecomendacion(self, stakeholder: str):
-        if stakeholder in self.recomendadoPor: 
-            self.recomendadoPor.remove(stakeholder)
-            self.importancia -= 1
+    def cancelar_recomendacion(self, stakeholder: str):
+        if stakeholder in self._recomendado_por: 
+            self._recomendado_por.remove(stakeholder)
