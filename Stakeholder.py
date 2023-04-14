@@ -11,7 +11,8 @@ class Stakeholder:
         return self._recomendado_por.count()
 
     def recomendar(self, stakeholder: str):
-        self._recomendado_por.append(stakeholder)
+        if stakeholder not in self._recomendado_por:
+            self._recomendado_por.append(stakeholder)
 
     def cancelar_recomendacion(self, stakeholder: str):
         if stakeholder in self._recomendado_por: 
