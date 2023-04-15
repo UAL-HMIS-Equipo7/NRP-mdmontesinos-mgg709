@@ -10,6 +10,8 @@ class NRP:
         self._stakeholders: list[Stakeholder] = []
 
     def cargar_stakeholders(self, ruta: str):
+        nombres_stakeholders = []
+        recomendaciones = {}
         stakeholders = []
 
         with open(ruta, mode='r') as csv_file:
@@ -18,13 +20,38 @@ class NRP:
             for row in csv_reader:
                 if line_count == 0:
                     print(f'Columnas en CSV para Stakeholder: {row.keys()}')
-                    
-                stakeholder = Stakeholder(row["nombre"], row["recomendado_por"].split(";"))
-                stakeholders.append(stakeholder)
+                
+                nombre_stakeholder = row["nombre"].strip()
+                if nombre_stakeholder == "":
+                    raise ValueError(f"Debe introducir un nombre para el stakeholder en la línea {line_count+1}.")
+                
+                nombres_stakeholders.append(nombre_stakeholder)
+                recomendaciones[row["nombre"]] = row["recomendado_por"].split(";")            
                 
                 line_count += 1
 
-            print(f'Cargados {line_count} stakeholders.\n')
+        for stakeholder_name in nombres_stakeholders:
+            stakeholder = Stakeholder(stakeholder_name)
+
+            for recomendador in recomendaciones[stakeholder_name]:
+                recomendador = recomendador.strip()
+                if recomendador == "":
+                    continue
+
+                if recomendador == stakeholder_name:
+                    raise ValueError(f"El stakeholder {stakeholder_name} no puede recomendarse a sí mismo.")
+                
+                if recomendador in stakeholder._recomendado_por:
+                    raise ValueError(f"El stakeholder {stakeholder_name} no puede ser recomendado varias veces por {recomendador}.")
+
+                if recomendador not in nombres_stakeholders:
+                    raise ValueError(f"Stakeholder {recomendador} no encontrado para el stakeholder {stakeholder_name}.")
+                
+                stakeholder.aniadir_recomendacion(recomendador)
+
+            stakeholders.append(stakeholder)
+
+        print(f'Cargados {line_count} stakeholders.\n')
         
         self._stakeholders = stakeholders
 
@@ -40,16 +67,31 @@ class NRP:
             for row in csv_reader:
                 if line_count == 0:
                     print(f'Columnas en CSV para Requisito: {row.keys()}')
+
+                nombre_requisito = row["nombre"].strip()
+
+                if nombre_requisito == "":
+                    raise ValueError(f"Debe introducir un nombre para el requisito en la línea {line_count+1}.")
                 
                 recomendado_por = []
                 for stakeholder_name in row["recomendado_por"].split(";"):
+                    stakeholder_name = stakeholder_name.strip()
+                    if stakeholder_name == "":
+                        continue
+
                     stakeholder_index  = [index for (index, item) in enumerate(self._stakeholders) if item._nombre == stakeholder_name]
+
                     if len(stakeholder_index) == 0:
-                        raise ValueError(f"Stakeholder {stakeholder_name} no encontrado")
+                        raise ValueError(f"Stakeholder {stakeholder_name} no encontrado para el requisito {row['nombre']}.")
+                    
                     stakeholder = self._stakeholders[stakeholder_index[0]]
+
+                    if stakeholder in recomendado_por:
+                        raise ValueError(f"El requisito {nombre_requisito} no puede ser recomendado varias veces por el stakeholder {stakeholder._nombre}.")
+
                     recomendado_por.append(stakeholder)
                     
-                requisito = Requisito(row["nombre"], row["descripcion"], recomendado_por)
+                requisito = Requisito(nombre_requisito, row["descripcion"].strip(), recomendado_por)
                 requisitos.append(requisito)
                 
                 line_count += 1
