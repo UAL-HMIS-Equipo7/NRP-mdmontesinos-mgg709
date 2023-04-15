@@ -74,16 +74,16 @@ class NRP:
         solucion = {}
         requisitos = sorted(self._requisitos, key=lambda r: r.importancia(), reverse=True)
         esfuerzo = 0
-        sprintActual = []
+        sprint_actual = []
         for requisito in requisitos:    
             if (esfuerzo + requisito._coste <= self._limite_esfuerzo):
-                sprintActual.append(requisito)
+                sprint_actual.append(requisito)
                 esfuerzo += requisito._coste
             else:
-                solucion["Sprint " + str(len(solucion)+1)] = list(sprintActual)
-                sprintActual = [requisito]
+                solucion["Sprint " + str(len(solucion)+1)] = list(sprint_actual)
+                sprint_actual = [requisito]
                 esfuerzo = requisito._coste
-        solucion["Sprint " + str(len(solucion)+1)] = list(sprintActual)
+        solucion["Sprint " + str(len(solucion)+1)] = list(sprint_actual)
 
         print(" --- Solución --- ")
         for sprint in solucion:

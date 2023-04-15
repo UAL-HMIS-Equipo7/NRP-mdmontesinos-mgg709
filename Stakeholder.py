@@ -10,7 +10,7 @@ class Stakeholder:
     def importancia(self):
         return len(self._recomendado_por)
 
-    def añadir_recomendacion(self, recomendador: str):
+    def aniadir_recomendacion(self, recomendador: str):
         if recomendador not in self._recomendado_por:
             self._recomendado_por.append(recomendador)
 

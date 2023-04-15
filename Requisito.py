@@ -19,7 +19,7 @@ class Requisito:
             importancia += stakeholder.importancia()
         return importancia
     
-    def añadir_recomendacion(self, recomendador: Stakeholder):
+    def aniadir_recomendacion(self, recomendador: Stakeholder):
         if recomendador not in self._recomendado_por:
             self._recomendado_por.append(recomendador)
 
