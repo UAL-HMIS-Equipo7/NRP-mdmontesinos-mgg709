@@ -1,10 +1,11 @@
 from Stakeholder import Stakeholder
 
-COST = 5
+COST = 4
 
 class Requisito:
 
-    def __init__(self, descripcion: str, recomendado_por: list[Stakeholder] = None):
+    def __init__(self, nombre: str, descripcion: str, recomendado_por: list[Stakeholder] = None):
+        self._nombre = nombre
         self._descripcion = descripcion
         if recomendado_por is None:
             self._recomendado_por = []
@@ -18,12 +19,16 @@ class Requisito:
             importancia += stakeholder.importancia()
         return importancia
     
-    def recomendar(self, stakeholder: Stakeholder):
-        if stakeholder not in self._recomendado_por:
-            self._recomendado_por.append(stakeholder)
+    def añadir_recomendacion(self, recomendador: Stakeholder):
+        if recomendador not in self._recomendado_por:
+            self._recomendado_por.append(recomendador)
 
-    def cancelar_recomendacion(self, stakeholder: Stakeholder):
-        if stakeholder in self._recomendado_por: 
-            self._recomendado_por.remove(stakeholder)
+    def cancelar_recomendacion(self, recomendador: Stakeholder):
+        if recomendador in self._recomendado_por:
+            self._recomendado_por.remove(recomendador)
 
-    
+    def __str__(self):
+        return f"Requisito {self._nombre} ({self.importancia()})"
+
+    def to_long_string(self):
+        return f"Requisito {self._nombre} ({self.importancia()}), con descripción: {self._descripcion}, recomendado por {[x._nombre for x in self._recomendado_por]}"
