@@ -125,10 +125,7 @@ def procesar_dependencias_requisito(nombre_requisito:str, nombres_dependencias: 
         requisito_asociado = requisito_asociado.strip()
         tipo = tipo.strip().upper()
 
-        if tipo not in ["I", "J", "X"]:
-            raise ValueError(f"El tipo de dependencia {tipo} no es válido para el requisito {nombre_requisito}.")
-
-        if requisito_asociado == "" or tipo == "":
+        if requisito_asociado == "" or tipo not in ["I", "J", "X"]:
             raise ValueError(f"El requisito {nombre_requisito} tiene una dependencia mal formada: {dependencia_name}.")
 
         if requisito_asociado not in nombres_requisitos:
