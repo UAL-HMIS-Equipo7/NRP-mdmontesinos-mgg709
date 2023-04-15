@@ -1,4 +1,4 @@
-nombre,descripcion,recomendado_por
-R1,Descripcion R1,S1;S2;S3
-R2,Descripcion R1,S4;S2;S5
-R3,Descripcion R1,S1;S5;S2;S3
+nombre,descripcion,recomendado_por,dependencias
+R1,Descripcion R1,S1;S2;S3,R3.I;R2.J,
+R2,Descripcion R1,S4;S2;S5,R1.J
+R3,Descripcion R1,S1;S5;S2;S3,R2.X

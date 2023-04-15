@@ -1,16 +1,21 @@
 from Stakeholder import Stakeholder
+from Dependencia import Dependencia
 
 COST = 4
 
 class Requisito:
 
-    def __init__(self, nombre: str, descripcion: str, recomendado_por: list[Stakeholder] = None):
+    def __init__(self, nombre: str, descripcion: str, recomendado_por: list[Stakeholder] = None, dependencias: list[Dependencia] = None):
         self._nombre = nombre
         self._descripcion = descripcion
         if recomendado_por is None:
             self._recomendado_por = []
         else:
             self._recomendado_por = recomendado_por
+        if dependencias is None:
+            self._dependencias = []
+        else:
+            self._dependencias = dependencias
         self._coste = COST
 
     def importancia(self):
@@ -31,4 +36,4 @@ class Requisito:
         return f"Requisito {self._nombre} ({self.importancia()})"
 
     def to_long_string(self):
-        return f"Requisito {self._nombre} ({self.importancia()}), con descripción: {self._descripcion}, recomendado por {[x._nombre for x in self._recomendado_por]}"
+        return f"Requisito {self._nombre} ({self.importancia()}), con descripción: {self._descripcion}, recomendado por {[x._nombre for x in self._recomendado_por]}, con dependencias: {[str(x) for x in self._dependencias]}"

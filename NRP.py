@@ -1,3 +1,4 @@
+from Dependencia import Dependencia
 from Requisito import Requisito
 from Stakeholder import Stakeholder
 import csv
@@ -41,10 +42,11 @@ class NRP:
             raise ValueError("Debe cargar los stakeholders antes que los requisitos.")
 
         requisitos = []
+        line_count = 0
 
         with open(ruta, mode='r') as csv_file:
             csv_reader = csv.DictReader(csv_file)
-            line_count = 0
+            dependencias = {}
             for row in csv_reader:
                 if line_count == 0:
                     print(f'Columnas en CSV para Requisito: {row.keys()}')
@@ -55,13 +57,17 @@ class NRP:
                     raise ValueError(f"Debe introducir un nombre para el requisito en la línea {line_count+1}.")
                 
                 recomendado_por = procesar_recomendaciones_requisito(nombre_requisito, row["recomendado_por"].split(";"), self._stakeholders)
+                dependencias[nombre_requisito] = row["dependencias"].split(";")
                     
                 requisito = Requisito(nombre_requisito, row["descripcion"].strip(), recomendado_por)
                 requisitos.append(requisito)
                 
                 line_count += 1
 
-            print(f'Cargados {line_count} requisitos.\n')
+        for requisito in requisitos:
+            requisito._dependencias = procesar_dependencias_requisito(requisito._nombre, dependencias[requisito._nombre], requisitos)
+
+        print(f'Cargados {line_count} requisitos.\n')
         
         self._requisitos = requisitos
 
@@ -100,6 +106,44 @@ class NRP:
             print()
 
         return solucion
+    
+def procesar_dependencias_requisito(nombre_requisito:str, nombres_dependencias: list[str], requisitos: list[Requisito]) -> list[Dependencia]:
+    dependencias = []
+    nombres_requisitos = [requisito._nombre for requisito in requisitos]
+    for dependencia_name in nombres_dependencias:
+        dependencia_name = dependencia_name.strip()
+        if dependencia_name == "":
+            continue
+
+        dependencia_split = dependencia_name.split(".")
+
+        if len(dependencia_split) != 2:
+            raise ValueError(f"El requisito {nombre_requisito} tiene una dependencia mal formada: {dependencia_name}.")
+        
+        requisito_asociado, tipo = dependencia_split
+
+        requisito_asociado = requisito_asociado.strip()
+        tipo = tipo.strip().upper()
+
+        if tipo not in ["I", "J", "X"]:
+            raise ValueError(f"El tipo de dependencia {tipo} no es válido para el requisito {nombre_requisito}.")
+
+        if requisito_asociado == "" or tipo == "":
+            raise ValueError(f"El requisito {nombre_requisito} tiene una dependencia mal formada: {dependencia_name}.")
+
+        if requisito_asociado not in nombres_requisitos:
+            raise ValueError(f"Requisito {requisito_asociado} no encontrado para el requisito {nombre_requisito}.")
+        
+        if requisito_asociado == nombre_requisito:
+            raise ValueError(f"El requisito {nombre_requisito} no puede depender de sí mismo.")
+        
+        if requisito_asociado in [dependencia._requisito for dependencia in dependencias]:
+            raise ValueError(f"El requisito {nombre_requisito} tiene una dependencia duplicada: {requisito_asociado}.")
+
+        dependencia = Dependencia(requisito_asociado, tipo)
+        dependencias.append(dependencia)
+
+    return dependencias
     
 def procesar_recomendaciones_requisito(nombre_requisito:str, nombres_stakeholders_recomendadores: list[str], stakeholders: list[Stakeholder]) -> list[Stakeholder]:
     recomendado_por = []
