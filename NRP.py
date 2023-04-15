@@ -30,26 +30,7 @@ class NRP:
                 
                 line_count += 1
 
-        for stakeholder_name in nombres_stakeholders:
-            stakeholder = Stakeholder(stakeholder_name)
-
-            for recomendador in recomendaciones[stakeholder_name]:
-                recomendador = recomendador.strip()
-                if recomendador == "":
-                    continue
-
-                if recomendador == stakeholder_name:
-                    raise ValueError(f"El stakeholder {stakeholder_name} no puede recomendarse a sí mismo.")
-                
-                if recomendador in stakeholder._recomendado_por:
-                    raise ValueError(f"El stakeholder {stakeholder_name} no puede ser recomendado varias veces por {recomendador}.")
-
-                if recomendador not in nombres_stakeholders:
-                    raise ValueError(f"Stakeholder {recomendador} no encontrado para el stakeholder {stakeholder_name}.")
-                
-                stakeholder.aniadir_recomendacion(recomendador)
-
-            stakeholders.append(stakeholder)
+        stakeholders = procesar_stakeholders(nombres_stakeholders, recomendaciones)
 
         print(f'Cargados {line_count} stakeholders.\n')
         
@@ -73,23 +54,7 @@ class NRP:
                 if nombre_requisito == "":
                     raise ValueError(f"Debe introducir un nombre para el requisito en la línea {line_count+1}.")
                 
-                recomendado_por = []
-                for stakeholder_name in row["recomendado_por"].split(";"):
-                    stakeholder_name = stakeholder_name.strip()
-                    if stakeholder_name == "":
-                        continue
-
-                    stakeholder_index  = [index for (index, item) in enumerate(self._stakeholders) if item._nombre == stakeholder_name]
-
-                    if len(stakeholder_index) == 0:
-                        raise ValueError(f"Stakeholder {stakeholder_name} no encontrado para el requisito {row['nombre']}.")
-                    
-                    stakeholder = self._stakeholders[stakeholder_index[0]]
-
-                    if stakeholder in recomendado_por:
-                        raise ValueError(f"El requisito {nombre_requisito} no puede ser recomendado varias veces por el stakeholder {stakeholder._nombre}.")
-
-                    recomendado_por.append(stakeholder)
+                recomendado_por = procesar_recomendaciones_requisito(nombre_requisito, row["recomendado_por"].split(";"), self._stakeholders)
                     
                 requisito = Requisito(nombre_requisito, row["descripcion"].strip(), recomendado_por)
                 requisitos.append(requisito)
@@ -135,6 +100,49 @@ class NRP:
             print()
 
         return solucion
+    
+def procesar_recomendaciones_requisito(nombre_requisito:str, nombres_stakeholders_recomendadores: list[str], stakeholders: list[Stakeholder]) -> list[Stakeholder]:
+    recomendado_por = []
+    for stakeholder_name in nombres_stakeholders_recomendadores:
+        stakeholder_name = stakeholder_name.strip()
+        if stakeholder_name == "":
+            continue
 
+        stakeholder_index  = [index for (index, item) in enumerate(stakeholders) if item._nombre == stakeholder_name]
+
+        if len(stakeholder_index) == 0:
+            raise ValueError(f"Stakeholder {stakeholder_name} no encontrado para el requisito {nombre_requisito}.")
+        
+        stakeholder = stakeholders[stakeholder_index[0]]
+
+        if stakeholder in recomendado_por:
+            raise ValueError(f"El requisito {nombre_requisito} no puede ser recomendado varias veces por el stakeholder {stakeholder._nombre}.")
+
+        recomendado_por.append(stakeholder)
+    return recomendado_por
+
+def procesar_stakeholders(nombres_stakeholders: list[str], recomendaciones: dict[str, list[str]]) -> list[Stakeholder]:
+    stakeholders = []
+    for stakeholder_name in nombres_stakeholders:
+        stakeholder = Stakeholder(stakeholder_name)
+
+        for recomendador in recomendaciones[stakeholder_name]:
+            recomendador = recomendador.strip()
+            if recomendador == "":
+                continue
+
+            if recomendador == stakeholder_name:
+                raise ValueError(f"El stakeholder {stakeholder_name} no puede recomendarse a sí mismo.")
+            
+            if recomendador in stakeholder._recomendado_por:
+                raise ValueError(f"El stakeholder {stakeholder_name} no puede ser recomendado varias veces por {recomendador}.")
+
+            if recomendador not in nombres_stakeholders:
+                raise ValueError(f"Stakeholder {recomendador} no encontrado para el stakeholder {stakeholder_name}.")
+            
+            stakeholder.aniadir_recomendacion(recomendador)
+
+        stakeholders.append(stakeholder)
+    return stakeholders
 
     
