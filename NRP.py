@@ -6,6 +6,7 @@ import csv
 RUTA_STAKEHOLDERS_POR_DEFECTO = "stakeholder_data.csv"
 RUTA_REQUISITOS_POR_DEFECTO = "requisito_data.csv"
 ESFUERZO_POR_DEFECTO = 5
+MENSAJE_NO_VALIDO = "Opción no válida."
 
 class NRP:
 
@@ -143,7 +144,7 @@ class NRP:
         print("7. Salir")
         input_opcion = input("\nIntroduzca una opción: ")
         while not input_opcion.isdigit():
-            print("Opción no válida.")
+            print(MENSAJE_NO_VALIDO)
             input_opcion = input("\nIntroduzca una opción: ")
         opcion = int(input_opcion)
         print("\n\n\n\n\n\n\n\n\n\n\n")
@@ -160,9 +161,9 @@ class NRP:
         elif opcion == 6:
             self.obtener_esfuerzo_por_consola()
         elif opcion == 7:
-            exit()
+            return
         else:
-            print("Opción no válida.")
+            print(MENSAJE_NO_VALIDO)
         input("Presione ENTER para continuar...")
         self.mostrar_opciones_menu()
 
@@ -174,7 +175,7 @@ class NRP:
     def obtener_esfuerzo_por_consola(self):
         limite_esfuerzo = input("Introduzca el límite de esfuerzo: ")
         while not limite_esfuerzo.isdigit() or int(limite_esfuerzo) <= 0:
-            print("Opción no válida.")
+            print(MENSAJE_NO_VALIDO)
             limite_esfuerzo = input("Introduzca el límite de esfuerzo: ")
         self._limite_esfuerzo = int(limite_esfuerzo)
     
