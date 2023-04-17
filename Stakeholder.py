@@ -19,4 +19,10 @@ class Stakeholder:
             self._recomendado_por.remove(recomendador)
 
     def __str__(self):
-        return f"Stakeholder {self._nombre} ({self.importancia()}), recomendado por {self._recomendado_por}"
+        return f"Stakeholder {self._nombre}, Importancia: {self.importancia()}, Recomendaciones: {self._recomendado_por}"
+    
+    def mostrar_recomendaciones(self):
+        salida = f"El stakeholder {self._nombre} ha sido recomendado por: "
+        for recomendador in self._recomendado_por:
+            salida += f"\n\t- {recomendador}"
+        return salida

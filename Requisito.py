@@ -33,7 +33,7 @@ class Requisito:
             self._recomendado_por.remove(recomendador)
 
     def __str__(self):
-        return f"Requisito {self._nombre} ({self.importancia()})"
+        return f"Requisito {self._nombre}, Importancia: {self.importancia()}, Coste: {self._coste}"
 
     def to_long_string(self):
-        return f"Requisito {self._nombre} ({self.importancia()}), con descripción: {self._descripcion}, recomendado por {[x._nombre for x in self._recomendado_por]}, con dependencias: {[str(x) for x in self._dependencias]}"
+        return f"Requisito {self._nombre}, Importancia: {self.importancia()}, Coste: {self._coste}, Descripción: {self._descripcion}, Recomendaciones: {[x._nombre for x in self._recomendado_por]}, Dependencias: {[str(x) for x in self._dependencias]}"

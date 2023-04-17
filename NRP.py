@@ -3,9 +3,13 @@ from Requisito import Requisito
 from Stakeholder import Stakeholder
 import csv
 
+RUTA_STAKEHOLDERS_POR_DEFECTO = "stakeholder_data.csv"
+RUTA_REQUISITOS_POR_DEFECTO = "requisito_data.csv"
+ESFUERZO_POR_DEFECTO = 5
+
 class NRP:
 
-    def __init__(self, limite_esfuerzo: int):
+    def __init__(self, limite_esfuerzo: int = ESFUERZO_POR_DEFECTO):
         self._limite_esfuerzo = limite_esfuerzo
         self._requisitos: list[Requisito] = []
         self._stakeholders: list[Stakeholder] = []
@@ -88,7 +92,10 @@ class NRP:
         requisitos = sorted(self._requisitos, key=lambda r: r.importancia(), reverse=True)
         esfuerzo = 0
         sprint_actual = []
-        for requisito in requisitos:    
+        for requisito in requisitos:
+            if (requisito._coste > self._limite_esfuerzo):
+                continue
+
             if (esfuerzo + requisito._coste <= self._limite_esfuerzo):
                 sprint_actual.append(requisito)
                 esfuerzo += requisito._coste
@@ -106,6 +113,83 @@ class NRP:
             print()
 
         return solucion
+    
+    def iniciar_por_consola(self):
+        print(" --- NRP --- ")
+
+        self.obtener_esfuerzo_por_consola()
+
+        ruta_stakeholders = input(f"\nIntroduzca la ruta del fichero de stakeholders ({RUTA_STAKEHOLDERS_POR_DEFECTO}): ")
+        if ruta_stakeholders == "":
+            ruta_stakeholders = RUTA_STAKEHOLDERS_POR_DEFECTO
+        self.cargar_stakeholders(ruta_stakeholders)
+
+        ruta_requisitos = input(f"Introduzca la ruta del fichero de requisitos ({RUTA_REQUISITOS_POR_DEFECTO}): ")
+        if ruta_requisitos == "":
+            ruta_requisitos = RUTA_REQUISITOS_POR_DEFECTO
+        self.cargar_requisitos(ruta_requisitos)
+
+        self.mostrar_opciones_menu()
+
+    def mostrar_opciones_menu(self):
+        print("\n\n\n\n\n\n\n\n\n\n\n")
+        print(" --- Menú --- ")
+        print("1. Mostrar requisitos")
+        print("2. Mostrar stakeholders")
+        print("3. Obtener recomendaciones de stakeholder")
+        print("4. Calcular solución")
+        print("5. Consultar esfuerzo")
+        print("6. Modificar esfuerzo")
+        print("7. Salir")
+        input_opcion = input("\nIntroduzca una opción: ")
+        while not input_opcion.isdigit():
+            print("Opción no válida.")
+            input_opcion = input("\nIntroduzca una opción: ")
+        opcion = int(input_opcion)
+        print("\n\n\n\n\n\n\n\n\n\n\n")
+        if opcion == 1:
+            self.mostrar_requisitos()
+        elif opcion == 2:
+            self.mostrar_stakeholders()
+        elif opcion == 3:
+            self.obtener_recomendaciones_stakeholder()
+        elif opcion == 4:
+            self.calcular_solucion()
+        elif opcion == 5:
+            self.mostrar_esfuerzo()
+        elif opcion == 6:
+            self.obtener_esfuerzo_por_consola()
+        elif opcion == 7:
+            exit()
+        else:
+            print("Opción no válida.")
+        input("Presione ENTER para continuar...")
+        self.mostrar_opciones_menu()
+
+    def mostrar_esfuerzo(self):
+        print(" --- Esfuerzo --- ")
+        print(f"Limite de esfuerzo: {self._limite_esfuerzo}")
+        print()
+
+    def obtener_esfuerzo_por_consola(self):
+        limite_esfuerzo = input("Introduzca el límite de esfuerzo: ")
+        while not limite_esfuerzo.isdigit() or int(limite_esfuerzo) <= 0:
+            print("Opción no válida.")
+            limite_esfuerzo = input("Introduzca el límite de esfuerzo: ")
+        self._limite_esfuerzo = int(limite_esfuerzo)
+    
+    def obtener_recomendaciones_stakeholder(self):
+        stakeholder_input = input("Introduzca el nombre del stakeholder: ")
+
+        stakeholder_index  = [index for (index, item) in enumerate(self._stakeholders) if item._nombre == stakeholder_input]
+
+        if len(stakeholder_index) == 0:
+            print(f"Stakeholder {stakeholder_input} no encontrado\n")
+        else:
+            stakeholder = self._stakeholders[stakeholder_index[0]]
+            print(stakeholder.mostrar_recomendaciones())
+        print()
+
     
 def procesar_dependencias_requisito(nombre_requisito:str, nombres_dependencias: list[str], requisitos: list[Requisito]) -> list[Dependencia]:
     dependencias = []
