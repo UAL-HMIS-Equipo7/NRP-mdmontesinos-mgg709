@@ -270,5 +270,3 @@ def procesar_stakeholders(nombres_stakeholders: list[str], recomendaciones: dict
 
         stakeholders.append(stakeholder)
     return stakeholders
-
-    

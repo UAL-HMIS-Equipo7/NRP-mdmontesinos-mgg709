@@ -13,5 +13,3 @@ class Dependencia:
 
     def __str__(self):
         return f"{self._requisito}-{self._tipo}"
-
-
